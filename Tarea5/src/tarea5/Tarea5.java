@@ -5,10 +5,12 @@
  */
 package tarea5;
 
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.net.URL;
 import java.util.LinkedList;
 import javax.swing.JFrame;
 
@@ -40,6 +42,8 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
     private LinkedList<Base> lklMeth; // LinkedList de clase base para meth
     
     // variables imagenes
+    private Image    imaImagenApplet;   // Imagen a proyectar en Applet	
+    private Graphics graGraficaApplet;  // Objeto grafico de la Imagen
     private Image imaGameOver; // imagen de gameover
     private Image imaBackground; // imagen del background
     private Image imaProyectil; // imagen del proyectil
@@ -125,6 +129,53 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
             }
         }
         
+        
+    }
+    
+        /**
+     * paint
+     * 
+     * Metodo sobrescrito de la clase <code>Applet</code>,
+     * heredado de la clase Container.<P>
+     * En este metodo lo que hace es actualizar el contenedor y 
+     * define cuando usar ahora el paint1
+     * 
+     * @param graGrafico es el <code>objeto grafico</code> usado para dibujar.
+     * 
+     */
+    public void paint (Graphics graGrafico) {
+        // Inicializan el DoubleBuffer
+        if (imaImagenApplet == null){
+                imaImagenApplet = createImage (this.getSize().width,
+                        this.getSize().height);
+                graGraficaApplet = imaImagenApplet.getGraphics ();
+        }
+ 
+        // Actualiza la imagen de fondo.
+        URL urlImagenFondo = this.getClass().getResource("Ciudad.png");
+        Image imaImagenFondo = Toolkit.getDefaultToolkit().getImage(urlImagenFondo);
+         graGraficaApplet.drawImage(imaImagenFondo, 0, 0, getWidth(), getHeight(), this);
+ 
+        // Actualiza el Foreground.
+        graGraficaApplet.setColor (getForeground());
+        paint1(graGraficaApplet);
+ 
+        // Dibuja la imagen actualizada
+        graGrafico.drawImage (imaImagenApplet, 0, 0, this);
+    }
+    
+    /**
+     * paint1
+     * 
+     * Metodo sobrescrito de la clase <code>Applet</code>,
+     * heredado de la clase Container.<P>
+     * En este metodo se dibuja la imagen con la posicion actualizada,
+     * ademas que cuando la imagen es cargada te despliega una advertencia.
+     * 
+     * @param graDibujo es el objeto de <code>Graphics</code> usado para dibujar.
+     * 
+     */
+    public void paint1(Graphics graDibujo){
         
     }
 
