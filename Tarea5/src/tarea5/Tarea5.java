@@ -111,12 +111,12 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
                     .getResource("bbcm.jpg"));
         
         // se crea el objeto base para la barra
-        basBarra = new tarea5.Base(iPosBarraX, iPosBarraY, getWidth(),
-                   getHeight(), imaBarra);
+        basBarra = new tarea5.Base(iPosBarraX, iPosBarraY, 200,
+                   100, imaBarra);
                   
         // se crea el objeto base para el proyectil
-        basProyectil = new tarea5.Base(iPosProyectilX, iPosProyectilY, getWidth(),
-                       getHeight(), imaProyectil);
+        basProyectil = new tarea5.Base(iPosProyectilX, iPosProyectilY, 30,
+                       40, imaProyectil);
         
         // se crean la linkedlist del meth
         lklMeth = new LinkedList();
@@ -124,7 +124,7 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
         Base basAux;
         for (int i = 1; i <= 2; i++) {
             for (int j = 1; j <= 10; j++) {
-                basAux = new Base (50 + j * 75, 50 + i * 75, 60, 60, imaMeth);
+                basAux = new Base (30 + j * 70, 30 + i * 70, 60, 90, imaMeth);
                        lklMeth.add(basAux);
             }
         }
@@ -176,7 +176,22 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
      * 
      */
     public void paint1(Graphics graDibujo){
-        
+        if(imaBackground != null) {
+                        graDibujo.drawImage (imaBackground, 0, 0, this);
+                }
+                
+                if (basProyectil != null && basBarra != null && lklMeth != null) {
+                        //Dibuja la imagen del proyectil en el JFrame
+                        basProyectil.paint(graDibujo, this);
+                        
+                        //Dibuja la imagen de la barra en el JFrame
+                        basBarra.paint(graDibujo, this);
+                        
+                        for(Base basMeth: lklMeth) {
+                                //dibuja la imagen de meth en el JFrame
+                                basMeth.paint(graDibujo, this);
+                        }
+                }
     }
 
     /**
@@ -193,15 +208,25 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
+    public void keyTyped(KeyEvent keEvent) {
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
+    public void keyPressed(KeyEvent keEvent) {
+        //key pressed para mover la barra <--->
+        if(keEvent.getKeyCode() == keEvent.VK_LEFT){
+            
+        }
+        if(keEvent.getKeyCode() == keEvent.VK_RIGHT){
+            
+        }
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
+    public void keyReleased(KeyEvent keEvent) {
+        if(keEvent.getKeyCode() == keEvent.VK_P) {
+            bPausa = !bPausa;
+        }
     }
     
 }
