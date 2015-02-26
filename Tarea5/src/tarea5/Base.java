@@ -186,18 +186,81 @@ public class Base {
     }
     
     /**
-     * Metodo intersecta
+     * Metodo intersectaIzq
      * 
-     * metodo que revisa si se intersectan dos objetos
+     * metodo que revisa si se intersectan dos objetos a la izq
      * 
      * @param objObjeto es un objeto de la clase <code>Objeto</code>
      * @return un balor <code>boolean</code> indicando si se intersectan
      */
     
-    public boolean intersecta(Object objObjeto) {
+    public boolean intersectaIzq(Object objObjeto) {
         if (objObjeto instanceof Base) {
             Rectangle rctEste = new Rectangle(this.getX(), this.getY(), 
-                                this.getAncho(), this.getAlto());
+                                5, this.getAlto());
+            Base basTemp = (Base) objObjeto;
+            Rectangle rctParam = new Rectangle(basTemp.getX(),basTemp.getY(),
+                                basTemp.getAncho(), basTemp.getAlto());
+            
+            return rctEste.intersects(rctParam);
+        }
+        return false;
+    }
+    /**
+     * Metodo intersectaDer
+     * 
+     * metodo que revisa si se intersectan dos objetos por la derecha
+     * 
+     * @param objObjeto es un objeto de la clase <code>Objeto</code>
+     * @return un balor <code>boolean</code> indicando si se intersectan
+     */
+    
+    public boolean intersectaDer(Object objObjeto) {
+        if (objObjeto instanceof Base) {
+            Rectangle rctEste = new Rectangle(this.getX() + this.getAncho() + 5,
+                                    this.getY(), 5, this.getAlto());
+            Base basTemp = (Base) objObjeto;
+            Rectangle rctParam = new Rectangle(basTemp.getX(),basTemp.getY(),
+                                basTemp.getAncho(), basTemp.getAlto());
+            
+            return rctEste.intersects(rctParam);
+        }
+        return false;
+    }
+    /**
+     * Metodo intersectaArr
+     * 
+     * metodo que revisa si se intersectan dos objetos por arriba
+     * 
+     * @param objObjeto es un objeto de la clase <code>Objeto</code>
+     * @return un balor <code>boolean</code> indicando si se intersectan
+     */
+    
+    public boolean intersectaArr(Object objObjeto) {
+        if (objObjeto instanceof Base) {
+            Rectangle rctEste = new Rectangle(this.getX(), this.getY(), 
+                                this.getAncho(), 5);
+            Base basTemp = (Base) objObjeto;
+            Rectangle rctParam = new Rectangle(basTemp.getX(),basTemp.getY(),
+                                basTemp.getAncho(), basTemp.getAlto());
+            
+            return rctEste.intersects(rctParam);
+        }
+        return false;
+    }
+    /**
+     * Metodo intersectaAba
+     * 
+     * metodo que revisa si se intersectan dos objetos por abajo
+     * 
+     * @param objObjeto es un objeto de la clase <code>Objeto</code>
+     * @return un balor <code>boolean</code> indicando si se intersectan
+     */
+    
+    public boolean intersectaAba(Object objObjeto) {
+        if (objObjeto instanceof Base) {
+            Rectangle rctEste = new Rectangle(this.getX() , this.getY() + this.getAlto() - 5, 
+                                this.getAncho(), 5);
             Base basTemp = (Base) objObjeto;
             Rectangle rctParam = new Rectangle(basTemp.getX(),basTemp.getY(),
                                 basTemp.getAncho(), basTemp.getAlto());

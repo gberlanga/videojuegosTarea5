@@ -27,12 +27,17 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
     private int iPosMethX; // posicion del meth en x
     private int iPosMethY; // posicion del meth en y
     private int iVidas; // numero de vidas restantes
+    private int iBarSpeed; // velocidad de movimiento de la barra
+    private int iProyVSpeed; // velocidad vertical del proyectil
+    private int iProyHSpeed; // velocidad horizontal del proyectil
     
     // variables booleanas
     private boolean bPausa; // booleana para pausar y despaudar el juego
     private boolean bGameOver; // booleana para definir el estado del juego
     private boolean bColision; // booleana para saber si el proyectil colisiona
     private boolean bStart; // booleana previo de empezar a jugar
+    private boolean bLeft; // booleana que indica que se mueve a la izq
+    private boolean bRight; // booleana que indica que se mueve a la der
     
     // variables clase Base
     private Base basBarra; // barra de clase base
@@ -48,7 +53,9 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
     private Image imaBackground; // imagen del background
     private Image imaProyectil; // imagen del proyectil
     private Image imaBarra; // imagen de la barra
-    private Image imaMeth; // imagen del meth
+    private Image imaMeth1; // imagen del meth1
+    private Image imaMeth2; // imagen del meth2
+    private Image imaMeth3; // imagen del meth3
     
     
     public Tarea5() {
@@ -83,7 +90,7 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
      */
     public void init(){
         //set size del juego
-        setSize(1000, 600);
+        setSize(500, 400);
         
         // inicializar las booleanas
         bGameOver = false;
@@ -95,40 +102,56 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
         iVidas = 5;
         
         // inicializacion de posiciones
-        iPosBarraX = 425;
-        iPosBarraY = 470;
-        iPosProyectilX = 500;
-        iPosProyectilY = 465;
+        iPosBarraX = 0;
+        iPosBarraY = 350;
+        iPosProyectilX = 400;
+        iPosProyectilY = 420;
         iPosMethX = 10;
         iPosMethY = 10;
         
+        //inicializacion de velocidades;
+        iBarSpeed = 3;
+        iProyHSpeed = 0;
+        iProyVSpeed = 2;
+        
         // poner las imagenes en sus variables
         imaBarra = Toolkit.getDefaultToolkit().getImage(this.getClass()
-                    .getResource("crowbar.png"));
+                    .getResource("barra.png"));
         imaProyectil = Toolkit.getDefaultToolkit().getImage(this.getClass()
-                    .getResource("bullet.png"));
-        imaMeth = Toolkit.getDefaultToolkit().getImage(this.getClass()
-                    .getResource("bbcm.jpg"));
+                    .getResource("bala.gif"));
+        imaMeth1 = Toolkit.getDefaultToolkit().getImage(this.getClass()
+                    .getResource("Meth1.png"));
+        
+        imaMeth2 = Toolkit.getDefaultToolkit().getImage(this.getClass()
+                    .getResource("Meth2.png"));
+        
+        imaMeth3 = Toolkit.getDefaultToolkit().getImage(this.getClass()
+                    .getResource("Meth2.png"));
         
         // se crea el objeto base para la barra
-        basBarra = new tarea5.Base(iPosBarraX, iPosBarraY, 200,
-                   100, imaBarra);
+        basBarra = new tarea5.Base(iPosBarraX, iPosBarraY, 100,
+                   20, imaBarra);
+        
+        basBarra.setX(getWidth()/2 - basBarra.getAncho()/2);
                   
         // se crea el objeto base para el proyectil
-        basProyectil = new tarea5.Base(iPosProyectilX, iPosProyectilY, 30,
-                       40, imaProyectil);
+        basProyectil = new tarea5.Base(iPosProyectilX, iPosProyectilY, 15,
+                       15, imaProyectil);
         
         // se crean la linkedlist del meth
         lklMeth = new LinkedList();
         
         Base basAux;
-        for (int i = 1; i <= 2; i++) {
-            for (int j = 1; j <= 10; j++) {
-                basAux = new Base (50 + j * 70, 50 + i * 70, 60, 90, imaMeth);
-                       lklMeth.add(basAux);
-            }
+        int iTempX = 0;
+        int iTempY = 70;
+        for (int i = 1; i <= 10; i++) {
+            
+                basAux = new Base (iTempX, iTempY, 60, 20, imaMeth1);
+                iTempX += 60;
+                lklMeth.add(basAux);       
         }
         
+        addKeyListener(this);
         
     }
     
@@ -152,7 +175,7 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
         }
  
         // Actualiza la imagen de fondo.
-        URL urlImagenFondo = this.getClass().getResource("Ciudad.png");
+        URL urlImagenFondo = this.getClass().getResource("background.png");
         Image imaImagenFondo = Toolkit.getDefaultToolkit().getImage(urlImagenFondo);
          graGraficaApplet.drawImage(imaImagenFondo, 0, 0, getWidth(), getHeight(), this);
  
@@ -187,10 +210,10 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
                         //Dibuja la imagen de la barra en el JFrame
                         basBarra.paint(graDibujo, this);
                         
-                        for(Base basMeth: lklMeth) {
+                        for(Base basMeth : lklMeth) {
                                 //dibuja la imagen de meth en el JFrame
                                 basMeth.paint(graDibujo, this);
-                        }
+                        }                        
                 }
     }
 
@@ -205,27 +228,169 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
 
     @Override
     public void run() {
+        /* mientras dure el juego, se actualizan posiciones de jugadores
+           se checa si hubo colisiones para desaparecer jugadores o corregir
+           movimientos y se vuelve a pintar todo
+        */
+        while (!bGameOver) {
+            if(!bPausa) {
+                actualiza();
+                checaColision();
+            }
+            repaint();
+            try {
+                // El thread se duerme.
+                Thread.sleep (20);
+            }
+            catch (InterruptedException iexError) {
+                System.out.println("Hubo un error en el juego " +
+                        iexError.toString());
+            }
+        }
+        repaint();
+        
+    }
+    
+    public void actualiza() {
+        if (bLeft) {
+            basBarra.setX(basBarra.getX() - iBarSpeed);
+        }
+        if (bRight) {
+            basBarra.setX(basBarra.getX() + iBarSpeed);
+        }
+        basProyectil.setY(basProyectil.getY() - iProyVSpeed);
+        basProyectil.setX(basProyectil.getX() - iProyHSpeed);
+        
+    }
+    
+    public void checaColision() {
+        if(basProyectil.getY() < 0) { // y esta pasando el limite
+                basProyectil.setY(0);
+                iProyVSpeed *= -1;
+            }
+            if(basProyectil.getY() + basProyectil.getAlto() > getHeight()) {
+                iProyVSpeed *= -1;
+                basProyectil.setX(basBarra.getX() + basBarra.getAncho()/2);
+                basProyectil.setY(basBarra.getY() - basProyectil.getAlto());
+                iVidas --;
+            }
+            if(basProyectil.getX() < 0) { // y se sale del applet
+                basProyectil.setX(0);
+                iProyHSpeed *= -1;
+            }
+            if(basProyectil.getX() + basProyectil.getAncho() > getWidth()) { 
+                basProyectil.setX(getWidth()- basProyectil.getAncho());
+                iProyHSpeed *= -1;
+            }
+            if(basBarra.getX() < 0) { // y se sale del applet
+                basBarra.setX(0);
+            }
+            if(basBarra.getX() + basBarra.getAncho() > getWidth()) { 
+                basBarra.setX(getWidth() - basBarra.getAncho());
+            }
+            Base basTemp = null;
+            for (Base basMeth : lklMeth) {
+                if (basMeth.intersectaIzq(basProyectil)) {
+                    iProyHSpeed *= -1;
+                    if (basMeth.getImagen() == imaMeth1){
+                        basMeth.setImagen(imaMeth2);
+                    }
+                    if (basMeth.getImagen() == imaMeth2){
+                        basMeth.setImagen(imaMeth3);
+                    }
+                    if (basMeth.getImagen() == imaMeth3){
+                       basTemp = basMeth;
+                    }
+                }
+                else if (basMeth.intersectaDer(basProyectil)) {
+                    iProyHSpeed *= -1;
+                    if (basMeth.getImagen() == imaMeth1){
+                        basMeth.setImagen(imaMeth2);
+                    }
+                    if (basMeth.getImagen() == imaMeth2){
+                        basMeth.setImagen(imaMeth3);
+                    }
+                    if (basMeth.getImagen() == imaMeth3){
+                       basTemp = basMeth;
+                    }
+                }
+                else if (basMeth.intersectaAba(basProyectil)) {
+                    iProyVSpeed *= -1;
+                    if (basMeth.getImagen() == imaMeth1){
+                        basMeth.setImagen(imaMeth2);
+                    }
+                    if (basMeth.getImagen() == imaMeth2){
+                        basMeth.setImagen(imaMeth3);
+                    }
+                    if (basMeth.getImagen() == imaMeth3){
+                       basTemp = basMeth;
+                    }
+                }
+                else if (basMeth.intersectaArr(basProyectil)) {
+                    iProyVSpeed *= -1;
+                   if (basMeth.getImagen() == imaMeth1){
+                        basMeth.setImagen(imaMeth2);
+                    }
+                   if (basMeth.getImagen() == imaMeth2){
+                        basMeth.setImagen(imaMeth3);
+                    }
+                   if (basMeth.getImagen() == imaMeth3){
+                       basTemp = basMeth;
+                    }
+                }
+            } 
+//            if (basTemp != null && basTemp.getImagen() == imaMeth1) {
+//                basTemp.setImagen(imaMeth2);
+//            }
+//            else if (basTemp != null && basTemp.getImagen() == imaMeth2) {
+//                basTemp.setImagen(imaMeth3);
+//            }
+            if (basTemp != null) {
+                lklMeth.remove(basTemp);
+            }
+            if (basBarra.intersectaArr(basProyectil)) {
+                colisionBarra();
+            }
+    }
+    
+    public void colisionBarra() {
+                iProyVSpeed *= -1;
+                double iPosX = basProyectil.getX() - basBarra.getX();
+                double iPercent = (iPosX / (basBarra.getAncho() - basProyectil.getAncho())) - 0.5;
+                iProyHSpeed += (int) -(iPercent * 8);
+                if (iProyHSpeed > 6) {
+                    iProyHSpeed = 6;
+                }
+                if (iProyHSpeed < -6) {
+                    iProyHSpeed = -6;
+                }
+        }
+
+    @Override
+    public void keyTyped(KeyEvent keyEvent) {
     }
 
     @Override
-    public void keyTyped(KeyEvent keEvent) {
-    }
-
-    @Override
-    public void keyPressed(KeyEvent keEvent) {
+    public void keyPressed(KeyEvent keyEvent) {
         //key pressed para mover la barra <--->
-        if(keEvent.getKeyCode() == keEvent.VK_LEFT){
-            
+        if(keyEvent.getKeyCode() == keyEvent.VK_LEFT){
+            bLeft = true;
         }
-        if(keEvent.getKeyCode() == keEvent.VK_RIGHT){
-            
+        if(keyEvent.getKeyCode() == keyEvent.VK_RIGHT){
+            bRight = true;
         }
     }
 
     @Override
-    public void keyReleased(KeyEvent keEvent) {
-        if(keEvent.getKeyCode() == keEvent.VK_P) {
+    public void keyReleased(KeyEvent keyEvent) {
+        if(keyEvent.getKeyCode() == keyEvent.VK_P) {
             bPausa = !bPausa;
+        }
+        if(keyEvent.getKeyCode() == keyEvent.VK_LEFT){
+            bLeft = false;
+        }
+        if(keyEvent.getKeyCode() == keyEvent.VK_RIGHT){
+            bRight = false;
         }
     }
     
