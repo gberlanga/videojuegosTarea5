@@ -31,6 +31,10 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
     private int iProyVSpeed; // velocidad vertical del proyectil
     private int iProyHSpeed; // velocidad horizontal del proyectil
     
+    //tiempos
+    private long tiempoActual; // el tiempo actual
+    private long tiempoInicial; // el tiempo en el que se inicio
+    
     // variables booleanas
     private boolean bPausa; // booleana para pausar y despaudar el juego
     private boolean bGameOver; // booleana para definir el estado del juego
@@ -45,17 +49,28 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
     
     // varialbes linkedlist
     private LinkedList<Base> lklMeth; // LinkedList de clase base para meth
+    private LinkedList<Animacion> lklAniMeth; // Lista de clase animacion
+    
+    // variables para animacion
+    private Animacion aniBala; // animacion de la bala
     
     // variables imagenes
     private Image    imaImagenApplet;   // Imagen a proyectar en Applet	
     private Graphics graGraficaApplet;  // Objeto grafico de la Imagen
     private Image imaGameOver; // imagen de gameover
     private Image imaBackground; // imagen del background
-    private Image imaProyectil; // imagen del proyectil
+    private Image imaProyectil1; // imagen del proyectil
+    private Image imaProyectil2; // imagen del proyectil
+    private Image imaProyectil3; // imagen del proyectil
+    private Image imaProyectil4; // imagen del proyectil
     private Image imaBarra; // imagen de la barra
     private Image imaMeth1; // imagen del meth1
     private Image imaMeth2; // imagen del meth2
     private Image imaMeth3; // imagen del meth3
+    private Image imaMeth4; // imagen del meth4
+    private Image imaMeth5; // imagen del meth5
+    
+    
     
     
     public Tarea5() {
@@ -90,8 +105,8 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
      */
     public void init(){
         //set size del juego
-        setSize(810, 528);
-        
+        setSize(600, 400);
+       
         // inicializar las booleanas
         bGameOver = false;
         bColision = true;
@@ -103,7 +118,7 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
         
         // inicializacion de posiciones
         iPosBarraX = 0;
-        iPosBarraY = 500;
+        iPosBarraY = 350;
         iPosProyectilX = 400;
         iPosProyectilY = 420;
         iPosMethX = 10;
@@ -112,13 +127,23 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
         //inicializacion de velocidades;
         iBarSpeed = 3;
         iProyHSpeed = 0;
-        iProyVSpeed = 2;
+        iProyVSpeed = 3;
         
         // poner las imagenes en sus variables
         imaBarra = Toolkit.getDefaultToolkit().getImage(this.getClass()
                     .getResource("barra.png"));
-        imaProyectil = Toolkit.getDefaultToolkit().getImage(this.getClass()
-                    .getResource("bala.gif"));
+        
+        imaProyectil1 = Toolkit.getDefaultToolkit().getImage(this.getClass()
+                    .getResource("bala1.png"));
+       
+        imaProyectil2 = Toolkit.getDefaultToolkit().getImage(this.getClass()
+                    .getResource("bala2.png"));
+        
+        imaProyectil3 = Toolkit.getDefaultToolkit().getImage(this.getClass()
+                    .getResource("bala3.png"));
+        imaProyectil4 = Toolkit.getDefaultToolkit().getImage(this.getClass()
+                    .getResource("bala4.png"));
+        
         imaMeth1 = Toolkit.getDefaultToolkit().getImage(this.getClass()
                     .getResource("Meth1.png"));
         
@@ -126,7 +151,21 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
                     .getResource("Meth2.png"));
         
         imaMeth3 = Toolkit.getDefaultToolkit().getImage(this.getClass()
-                    .getResource("Meth2.png"));
+                    .getResource("Meth3.png"));
+        
+        imaMeth4 = Toolkit.getDefaultToolkit().getImage(this.getClass()
+                    .getResource("Meth4.png"));
+        
+        imaMeth5 = Toolkit.getDefaultToolkit().getImage(this.getClass()
+                    .getResource("Meth5.png"));
+        
+
+        aniBala = new Animacion();
+        aniBala.sumaCuadro(imaProyectil1, 100);
+        aniBala.sumaCuadro(imaProyectil2, 100);
+        aniBala.sumaCuadro(imaProyectil3, 100);
+        aniBala.sumaCuadro(imaProyectil4, 100);
+        
         
         // se crea el objeto base para la barra
         basBarra = new tarea5.Base(iPosBarraX, iPosBarraY, 100,
@@ -136,19 +175,30 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
                   
         // se crea el objeto base para el proyectil
         basProyectil = new tarea5.Base(iPosProyectilX, iPosProyectilY, 15,
-                       15, imaProyectil);
+                       15, imaProyectil1);
         
         // se crean la linkedlist del meth
         lklMeth = new LinkedList();
+        lklAniMeth = new LinkedList();
         
         Base basAux;
+        Animacion aniAux;
         int iTempX = 0;
         int iTempY = 70;
         for (int i = 1; i <= 10; i++) {
             
-                basAux = new Base (iTempX, iTempY, 60, 20, imaMeth1);
-                iTempX += 60;
-                lklMeth.add(basAux);       
+            basAux = new Base (iTempX, iTempY, 60, 20, imaMeth1);
+            iTempX += 60;
+            lklMeth.add(basAux);       
+
+            // se crea la animacion
+            aniAux = new Animacion();
+            aniAux.sumaCuadro(imaMeth1, 100);
+            aniAux.sumaCuadro(imaMeth2, 100);
+            aniAux.sumaCuadro(imaMeth3, 100);
+            aniAux.sumaCuadro(imaMeth4, 100);
+            aniAux.sumaCuadro(imaMeth5, 100);
+            lklAniMeth.add(aniAux);
         }
         
         addKeyListener(this);
@@ -232,6 +282,8 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
            se checa si hubo colisiones para desaparecer jugadores o corregir
            movimientos y se vuelve a pintar todo
         */
+        tiempoActual = System.currentTimeMillis();
+        
         while (!bGameOver) {
             if(!bPausa) {
                 actualiza();
@@ -247,11 +299,29 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
                         iexError.toString());
             }
         }
-        repaint();
+        while(bGameOver){
+            repaint();
+            actualiza();
+
+        }
+       
         
     }
     
     public void actualiza() {
+        long tiempoTranscurrido = System.currentTimeMillis() - tiempoActual;
+        tiempoActual += tiempoTranscurrido;
+
+        aniBala.actualiza(tiempoTranscurrido);
+        basProyectil.setImagen(aniBala.getImagen());
+
+
+        for (int iI = 0; iI < lklMeth.size(); iI ++ ) {
+            Animacion aniObjeto = lklAniMeth.get(iI);
+            Base basObjeto = lklMeth.get(iI);
+            basObjeto.setImagen(aniObjeto.getImagen());
+        }        
+
         if (bLeft) {
             basBarra.setX(basBarra.getX() - iBarSpeed);
         }
@@ -260,7 +330,10 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
         }
         basProyectil.setY(basProyectil.getY() - iProyVSpeed);
         basProyectil.setX(basProyectil.getX() - iProyHSpeed);
-        
+
+        if (iVidas <= 0) {
+            bGameOver = true;
+        }
     }
     
     public void checaColision() {
@@ -289,68 +362,77 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
                 basBarra.setX(getWidth() - basBarra.getAncho());
             }
             Base basTemp = null;
-            for (Base basMeth : lklMeth) {
+            Animacion aniTemp = null;
+
+            
+            for (int iI = 0; iI < lklMeth.size(); iI ++ ) {
+                Base basMeth = lklMeth.get(iI);
                 if (basMeth.intersectaIzq(basProyectil)) {
                     iProyHSpeed *= -1;
-                    if (basMeth.getImagen() == imaMeth1){
-                        basMeth.setImagen(imaMeth2);
+                    if (basMeth.getImagen() == imaMeth3) {
+                        basMeth.setImagen(advAnim(iI));
+                        basMeth.setImagen(advAnim(iI));
+                        basTemp = basMeth;
+                        aniTemp = lklAniMeth.get(iI);
                     }
-                    if (basMeth.getImagen() == imaMeth2){
-                        basMeth.setImagen(imaMeth3);
-                    }
-                    if (basMeth.getImagen() == imaMeth3){
-                       basTemp = basMeth;
+                    else {
+                        basMeth.setImagen(advAnim(iI));
                     }
                 }
                 else if (basMeth.intersectaDer(basProyectil)) {
                     iProyHSpeed *= -1;
-                    if (basMeth.getImagen() == imaMeth1){
-                        basMeth.setImagen(imaMeth2);
+                    if (basMeth.getImagen() == imaMeth3) {
+                        basMeth.setImagen(advAnim(iI));
+                        basMeth.setImagen(advAnim(iI));
+                        basTemp = basMeth;
+                        aniTemp = lklAniMeth.get(iI);
                     }
-                    if (basMeth.getImagen() == imaMeth2){
-                        basMeth.setImagen(imaMeth3);
-                    }
-                    if (basMeth.getImagen() == imaMeth3){
-                       basTemp = basMeth;
+                    else {
+                        basMeth.setImagen(advAnim(iI));
                     }
                 }
                 else if (basMeth.intersectaAba(basProyectil)) {
                     iProyVSpeed *= -1;
-                    if (basMeth.getImagen() == imaMeth1){
-                        basMeth.setImagen(imaMeth2);
+                    if (basMeth.getImagen() == imaMeth3) {
+                        basMeth.setImagen(advAnim(iI));
+                        basMeth.setImagen(advAnim(iI));
+                        basTemp = basMeth;
+                        aniTemp = lklAniMeth.get(iI);
                     }
-                    if (basMeth.getImagen() == imaMeth2){
-                        basMeth.setImagen(imaMeth3);
-                    }
-                    if (basMeth.getImagen() == imaMeth3){
-                       basTemp = basMeth;
+                    else {
+                        basMeth.setImagen(advAnim(iI));
                     }
                 }
                 else if (basMeth.intersectaArr(basProyectil)) {
                     iProyVSpeed *= -1;
-                   if (basMeth.getImagen() == imaMeth1){
-                        basMeth.setImagen(imaMeth2);
+                    if (basMeth.getImagen() == imaMeth3) {
+                        basMeth.setImagen(advAnim(iI));
+                        basMeth.setImagen(advAnim(iI));
+                        basTemp = basMeth;
+                        aniTemp = lklAniMeth.get(iI);
                     }
-                   if (basMeth.getImagen() == imaMeth2){
-                        basMeth.setImagen(imaMeth3);
-                    }
-                   if (basMeth.getImagen() == imaMeth3){
-                       basTemp = basMeth;
+                    else {
+                        basMeth.setImagen(advAnim(iI));
                     }
                 }
             } 
-//            if (basTemp != null && basTemp.getImagen() == imaMeth1) {
-//                basTemp.setImagen(imaMeth2);
-//            }
-//            else if (basTemp != null && basTemp.getImagen() == imaMeth2) {
-//                basTemp.setImagen(imaMeth3);
-//            }
+       
             if (basTemp != null) {
+                lklAniMeth.remove(aniTemp);
                 lklMeth.remove(basTemp);
+                
             }
             if (basBarra.intersectaArr(basProyectil)) {
                 colisionBarra();
             }
+    }
+    
+    public Image advAnim(int iIndex) {
+        
+    Animacion aniTemp = lklAniMeth.get(iIndex);
+    aniTemp.actualiza(101);
+
+    return aniTemp.getImagen();
     }
     
     public void colisionBarra() {
@@ -392,6 +474,11 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
         if(keyEvent.getKeyCode() == keyEvent.VK_RIGHT){
             bRight = false;
         }
+        if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
+                        if (bGameOver) {
+                                init();
+                        }
+}
     }
     
 }
