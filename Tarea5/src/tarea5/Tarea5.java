@@ -90,7 +90,7 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
      */
     public void init(){
         //set size del juego
-        setSize(500, 400);
+        setSize(810, 528);
         
         // inicializar las booleanas
         bGameOver = false;
@@ -103,7 +103,7 @@ public class Tarea5 extends JFrame implements Runnable, KeyListener {
         
         // inicializacion de posiciones
         iPosBarraX = 0;
-        iPosBarraY = 350;
+        iPosBarraY = 500;
         iPosProyectilX = 400;
         iPosProyectilY = 420;
         iPosMethX = 10;
