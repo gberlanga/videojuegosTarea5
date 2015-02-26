@@ -1,3 +1,5 @@
+package tarea5;
+
 import java.awt.Image;
 import java.util.ArrayList;
 
